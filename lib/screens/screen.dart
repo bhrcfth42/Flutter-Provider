@@ -49,32 +49,7 @@ class Body extends StatelessWidget {
             children: [
               Expanded(
                 flex: 2,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: const AssetImage('images/background.png'),
-                      fit: BoxFit.cover,
-                      colorFilter: ColorFilter.mode(
-                          Colors.black.withOpacity(0.4), BlendMode.dstATop),
-                    ),
-                  ),
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: "Arama",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(4.0),
-                        ),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      state.searchData(value);
-                    },
-                  ),
-                ),
+                child: searcWidget(state),
               ),
               Expanded(
                 flex: 7,
@@ -82,6 +57,35 @@ class Body extends StatelessWidget {
               ),
             ],
           );
+        },
+      ),
+    );
+  }
+
+  Widget searcWidget(RemoteokState state) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: const AssetImage('images/background.png'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.4), BlendMode.dstATop),
+        ),
+      ),
+      child: TextField(
+        decoration: const InputDecoration(
+          hintText: "Arama",
+          prefixIcon: Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(4.0),
+            ),
+          ),
+        ),
+        onChanged: (value) {
+          state.searchData(value);
         },
       ),
     );
@@ -98,131 +102,164 @@ class ItemList extends StatelessWidget {
     return ListView.builder(
       itemBuilder: (context, index) {
         Remoteok remoteok = remoteoks![index];
-        return GestureDetector(
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Text(
-                          remoteok.position!,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Text(remoteok.description!),
-                      ],
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.all(8),
-                );
-              },
-            );
-          },
-          child: Container(
-            height: 120.0,
-            margin: const EdgeInsets.symmetric(
-              vertical: 16.0,
-              horizontal: 24.0,
-            ),
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  height: 124.0,
-                  margin: const EdgeInsets.only(left: 46.0),
-                  padding: const EdgeInsets.only(left: 46.0),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF333366),
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow: const <BoxShadow>[
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 10.0,
-                        offset: Offset(0.0, 10.0),
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.all(8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          remoteok.position!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          remoteok.location!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: remoteok.tags!.map<Widget>((e) {
-                              return Container(
-                                margin: const EdgeInsets.all(4),
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.white54,
-                                  ),
-                                ),
-                                child: Text(
-                                  e,
-                                  style: const TextStyle(
-                                    color: Colors.white54,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 16.0),
-                  alignment: FractionalOffset.centerLeft,
-                  child: remoteok.companyLogo == ""
-                      ? const SizedBox.shrink()
-                      : ClipOval(
-                          child: Image.network(
-                            remoteok.companyLogo!,
-                            fit: BoxFit.contain,
-                            width: 90.0,
-                            height: 90.0,
-                          ),
-                        ),
-                ),
-              ],
-            ),
-          ),
-        );
+        return itemWidget(context, remoteok);
       },
       itemCount: remoteoks?.length,
       shrinkWrap: true,
       physics: const ClampingScrollPhysics(),
+    );
+  }
+
+  Widget itemWidget(BuildContext context, Remoteok remoteok) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return icerikDialogWidget(remoteok);
+          },
+        );
+      },
+      child: Container(
+        height: 120.0,
+        margin: const EdgeInsets.symmetric(
+          vertical: 16.0,
+          horizontal: 24.0,
+        ),
+        child: Stack(
+          children: <Widget>[
+            itemIcerikWidget(remoteok),
+            itemLogoWidget(remoteok),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget icerikDialogWidget(Remoteok remoteok) {
+    return AlertDialog(
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text(
+              remoteok.position!,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Text(remoteok.description!),
+          ],
+        ),
+      ),
+      contentPadding: const EdgeInsets.all(8),
+    );
+  }
+
+  Widget itemIcerikWidget(Remoteok remoteok) {
+    return Container(
+      height: 124.0,
+      margin: const EdgeInsets.only(left: 46.0),
+      padding: const EdgeInsets.only(left: 46.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF333366),
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10.0,
+            offset: Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              remoteok.position!,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              remoteok.location!,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            tagsWidget(remoteok),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget tagsWidget(Remoteok remoteok) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: remoteok.tags!.map<Widget>((e) {
+          return Container(
+            margin: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.white54,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              e,
+              style: const TextStyle(
+                color: Colors.white54,
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget itemLogoWidget(Remoteok remoteok) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16.0),
+      alignment: FractionalOffset.centerLeft,
+      width: 90.0,
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.blueAccent),
+          color: Colors.white54,
+          shape: BoxShape.circle),
+      child: remoteok.companyLogo == ""
+          ? ClipOval(
+              child: Image.asset(
+                "images/no-image.png",
+                fit: BoxFit.contain,
+                width: 90.0,
+                height: 90.0,
+              ),
+            )
+          : ClipOval(
+              child: Image.network(
+                remoteok.companyLogo!,
+                fit: BoxFit.contain,
+                width: 90.0,
+                height: 90.0,
+              ),
+            ),
     );
   }
 }
